@@ -1,7 +1,7 @@
 import {
   assert,
   assertEquals,
-} from "https://deno.land/std@0.221.0/assert/mod.ts";
+} from "https://deno.land/std@0.224.0/assert/mod.ts";
 import { Tkv } from "./mod.ts";
 
 const db = await Deno.openKv();
