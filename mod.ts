@@ -2,14 +2,16 @@
  * Typed wrapper for {@link Deno.KvEntry}.
  */
 export type TkvEntry<K extends Deno.KvKey, T> = Deno.KvEntry<T> & {
-  key: readonly [...K];
+  key: K;
 };
 
 /**
  * Typed wrapper for {@link Deno.KvEntryMaybe}.
  */
-export type TkvEntryMaybe<K extends Deno.KvKey, T> = TkvEntry<K, T> | {
-  key: readonly [...K];
+export type TkvEntryMaybe<K extends Deno.KvKey, T> =
+  | TkvEntry<K, T>
+  | {
+    key: K;
   value: null;
   versionstamp: null;
 };
@@ -19,9 +21,9 @@ export type TkvEntryMaybe<K extends Deno.KvKey, T> = TkvEntry<K, T> | {
  */
 export type TkvListSelector<K extends Deno.KvKey> =
   | { prefix: tkvKeyPrefix<K> }
-  | { prefix: tkvKeyPrefix<K>; start: readonly [...K] }
-  | { prefix: tkvKeyPrefix<K>; end: readonly [...K] }
-  | { start: readonly [...K]; end: readonly [...K] };
+  | { prefix: tkvKeyPrefix<K>; start: K }
+  | { prefix: tkvKeyPrefix<K>; end: K }
+  | { start: K; end: K };
 
 /**
  * Typed wrapper for {@link Deno.KvListIterator}.
@@ -33,9 +35,10 @@ export type TkvListIterator<K extends Deno.KvKey, T> =
 /**
  * Gives all possible prefixes for a given key type.
  */
-export type tkvKeyPrefix<Key extends Deno.KvKey> = Key extends
-  readonly [infer Prefix, ...infer Rest extends Deno.KvKey]
-  ? readonly [Prefix] | readonly [Prefix, ...tkvKeyPrefix<Rest>]
+export type tkvKeyPrefix<Key extends Deno.KvKey> = Key extends readonly [
+  infer Prefix,
+  ...infer Rest extends Deno.KvKey,
+] ? readonly [Prefix] | readonly [Prefix, ...tkvKeyPrefix<Rest>]
   : never;
 
 /**
@@ -51,7 +54,7 @@ export class Tkv<K extends Deno.KvKey, T> {
    * Typed wrapper for {@link Deno.Kv.get}.
    */
   get(
-    key: readonly [...K],
+    key: K,
     options?: Parameters<Deno.Kv["get"]>[1],
   ): Promise<TkvEntryMaybe<K, T>> {
     return this.db.get<T>(key, options) as Promise<TkvEntryMaybe<K, T>>;
@@ -61,7 +64,7 @@ export class Tkv<K extends Deno.KvKey, T> {
    * Typed wrapper for {@link Deno.Kv.set}.
    */
   set(
-    key: readonly [...K],
+    key: K,
     value: T,
     options?: Parameters<Deno.Kv["set"]>[2],
   ): ReturnType<Deno.Kv["set"]> {
@@ -74,12 +77,13 @@ export class Tkv<K extends Deno.KvKey, T> {
    * @returns The result of {@link Deno.AtomicOperation.commit}.
    */
   atomicSet(
-    key: readonly [...K],
+    key: K,
     versionstamp: Deno.AtomicCheck["versionstamp"],
     value: T,
     options?: Parameters<Deno.AtomicOperation["set"]>[2],
   ): ReturnType<Deno.AtomicOperation["commit"]> {
-    return this.db.atomic()
+    return this.db
+      .atomic()
       .check({ key, versionstamp })
       .set(key, value, options)
       .commit();
@@ -88,7 +92,7 @@ export class Tkv<K extends Deno.KvKey, T> {
   /**
    * Typed wrapper for {@link Deno.Kv.delete}.
    */
-  delete(key: readonly [...K]): ReturnType<Deno.Kv["delete"]> {
+  delete(key: K): ReturnType<Deno.Kv["delete"]> {
     return this.db.delete(key);
   }
 
@@ -98,13 +102,10 @@ export class Tkv<K extends Deno.KvKey, T> {
    * @returns The result of {@link Deno.AtomicOperation.commit}.
    */
   atomicDelete(
-    key: readonly [...K],
+    key: K,
     versionstamp: Deno.AtomicCheck["versionstamp"],
   ): ReturnType<Deno.AtomicOperation["commit"]> {
-    return this.db.atomic()
-      .check({ key, versionstamp })
-      .delete(key)
-      .commit();
+    return this.db.atomic().check({ key, versionstamp }).delete(key).commit();
   }
 
   /**
