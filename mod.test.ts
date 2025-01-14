@@ -152,4 +152,15 @@ Deno.test("atomic works", async () => {
     const entries = await Array.fromAsync(barStore.list({ prefix: ["bar"] }));
     assertEquals(entries.length, 0);
   }
+
+  await barStore.atomicUpdate(["bar", "c"], (v) => {
+    assertEquals(v, undefined);
+    return "a";
+  });
+  assertEquals((await barStore.get(["bar", "c"])).value, "a");
+  await barStore.atomicUpdate(["bar", "c"], (v) => {
+    assertEquals(v, "a");
+    return undefined;
+  });
+  assertEquals((await barStore.get(["bar", "c"])).value, null);
 });

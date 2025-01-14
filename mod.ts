@@ -109,6 +109,24 @@ export class Tkv<K extends Deno.KvKey, T> {
   }
 
   /**
+   * Shortcut for {@link Tkv.get} and then {@link Tkv.atomicSet} (or {@link Tkv.atomicDelete} if updater returns undefined).
+   */
+  async atomicUpdate(
+    key: K,
+    updater: (value: T | undefined) => T | undefined | Promise<T | undefined>,
+    setOptions?: Parameters<Deno.Kv["set"]>[2],
+    getOptions?: Parameters<Deno.Kv["get"]>[1],
+  ): Promise<ReturnType<Deno.AtomicOperation["commit"]>> {
+    const { value, versionstamp } = await this.get(key, getOptions);
+    const newValue = await updater(versionstamp == null ? undefined : value);
+    if (newValue !== undefined) {
+      return this.atomicSet(key, versionstamp, newValue, setOptions);
+    } else {
+      return this.atomicDelete(key, versionstamp);
+    }
+  }
+
+  /**
    * Typed wrapper for {@link Deno.Kv.list}.
    */
   list(
