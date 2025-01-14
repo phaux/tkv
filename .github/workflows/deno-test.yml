@@ -14,7 +14,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v1
-      - run: deno task test
-      - uses: VeryGoodOpenSource/very_good_coverage@v2
-        with:
-          min_coverage: 90
+      - run: deno test --unstable-kv

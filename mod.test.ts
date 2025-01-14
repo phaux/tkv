@@ -1,7 +1,4 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.224.0/assert/mod.ts";
+import { assert, assertEquals } from "jsr:@std/assert@1.0.10";
 import { Tkv } from "./mod.ts";
 
 const db = await Deno.openKv();
@@ -71,7 +68,7 @@ Deno.test("atomic works", async () => {
     const result = await barStore.atomicSet(
       ["bar", "b"],
       resultA.versionstamp,
-      "qwe",
+      "qwe"
     );
     assert(!result.ok);
   }
@@ -88,7 +85,7 @@ Deno.test("atomic works", async () => {
   const resultA2 = await barStore.atomicSet(
     ["bar", "a"],
     resultA.versionstamp,
-    "asdf",
+    "asdf"
   );
   assert(resultA2.ok);
   const entryA2 = await barStore.get(["bar", "a"]);
@@ -102,7 +99,7 @@ Deno.test("atomic works", async () => {
     const result = await barStore.atomicSet(
       ["bar", "a"],
       resultA.versionstamp,
-      "asdfg",
+      "asdfg"
     );
     assert(!result.ok);
   }
@@ -118,7 +115,7 @@ Deno.test("atomic works", async () => {
   {
     const result = await barStore.atomicDelete(
       ["bar", "b"],
-      resultB.versionstamp,
+      resultB.versionstamp
     );
     assert(result.ok);
     const entry = await barStore.get(["bar", "b"]);
@@ -133,7 +130,7 @@ Deno.test("atomic works", async () => {
   {
     const result = await barStore.atomicDelete(
       ["bar", "a"],
-      resultA.versionstamp,
+      resultA.versionstamp
     );
     assert(!result.ok);
   }
@@ -141,7 +138,7 @@ Deno.test("atomic works", async () => {
   {
     const result = await barStore.atomicDelete(
       ["bar", "a"],
-      resultA2.versionstamp,
+      resultA2.versionstamp
     );
     assert(result.ok);
     const entry = await barStore.get(["bar", "a"]);

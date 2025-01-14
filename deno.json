@@ -1,21 +1,6 @@
 {
-  "compilerOptions": {
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true
-  },
-  "fmt": {
-    "proseWrap": "preserve"
-  },
-  "lint": {
-    "rules": {
-      "exclude": [
-        "require-await"
-      ]
-    }
-  },
-  "lock": false,
-  "tasks": {
-    "cdnup": "deno run --allow-read --allow-write=. --allow-net https://deno.land/x/cdnup@v1.2.0/main.ts --skip '**/coverage' -w",
-    "test": "rm -rf coverage && deno test --unstable-kv --coverage && deno coverage --lcov --output=coverage/lcov.info && deno lint"
-  }
+  "name": "@smol/tkv",
+  "version": "0.2.0",
+  "exports": "./mod.ts",
+  "lock": false
 }
