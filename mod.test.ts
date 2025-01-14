@@ -164,3 +164,33 @@ Deno.test("atomic works", async () => {
   });
   assertEquals((await barStore.get(["bar", "c"])).value, null);
 });
+
+Deno.test("watch works", async () => {
+  const bazStore = new Tkv<["baz", number], number>(db);
+
+  await bazStore.set(["baz", 1], 1);
+
+  const stream = bazStore.watch([["baz", 1]]);
+  const reader = stream.getReader();
+  {
+    const result = await reader.read();
+    assertEquals(result.done, false);
+    assertEquals(result.value?.length, 1);
+    assertEquals(result.value?.[0]?.value, 1);
+  }
+  await bazStore.set(["baz", 1], 2);
+  {
+    const result = await reader.read();
+    assertEquals(result.done, false);
+    assertEquals(result.value?.length, 1);
+    assertEquals(result.value?.[0]?.value, 2);
+  }
+  await bazStore.delete(["baz", 1]);
+  {
+    const result = await reader.read();
+    assertEquals(result.done, false);
+    assertEquals(result.value?.length, 1);
+    assertEquals(result.value?.[0]?.value, null);
+  }
+  await reader.cancel();
+});
