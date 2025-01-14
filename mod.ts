@@ -12,9 +12,9 @@ export type TkvEntryMaybe<K extends Deno.KvKey, T> =
   | TkvEntry<K, T>
   | {
     key: K;
-  value: null;
-  versionstamp: null;
-};
+    value: null;
+    versionstamp: null;
+  };
 
 /**
  * Typed wrapper for {@link Deno.KvListSelector}.
@@ -134,5 +134,17 @@ export class Tkv<K extends Deno.KvKey, T> {
     options?: Parameters<Deno.Kv["list"]>[1],
   ): TkvListIterator<K, T> {
     return this.db.list<T>(selector, options) as TkvListIterator<K, T>;
+  }
+
+  /**
+   * Typed wrapper for {@link Deno.Kv.watch}.
+   */
+  watch(
+    keys: K[],
+    options?: Parameters<Deno.Kv["watch"]>[1],
+  ): ReadableStream<TkvEntryMaybe<K, T>[]> {
+    return this.db.watch(keys, options) as ReadableStream<
+      TkvEntryMaybe<K, T>[]
+    >;
   }
 }
