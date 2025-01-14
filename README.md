@@ -1,6 +1,6 @@
 # Deno Typed KV
 
-[![deno doc](https://doc.deno.land/badge.svg)](https://deno.land/x/tkv/mod.ts?s=Tkv)
+[![JSR](https://jsr.io/badges/@smol/tkv)](https://jsr.io/@smol/tkv)
 
 Add some type safety to your Deno KV store.
 
